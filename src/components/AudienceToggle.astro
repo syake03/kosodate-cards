@@ -1,0 +1,86 @@
+---
+// SPEC.md §8 本人向け／専門家向けトグル。既定は「本人向け」。
+// 状態は <html data-audience> と localStorage で保持する。
+---
+
+<div class="audience-toggle" role="group" aria-label="表示の切り替え">
+  <span class="at-label">表示：</span>
+  <div class="at-buttons">
+    <button type="button" data-audience-set="parent" class="at-btn">本人向け</button>
+    <button type="button" data-audience-set="expert" class="at-btn">専門家向け</button>
+  </div>
+  <p class="at-hint" data-audience-hint></p>
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    var btns = document.querySelectorAll('[data-audience-set]');
+    var hintEl = document.querySelector('[data-audience-hint]');
+    var HINTS = {
+      parent: '「どうする・よくある誤解」を前面に。まず読むならこちら。',
+      expert: '背景・エビデンスの限界・出典を全面展開します。',
+    };
+    function apply(mode) {
+      root.dataset.audience = mode;
+      try {
+        localStorage.setItem('audience', mode);
+      } catch (e) {}
+      btns.forEach(function (b) {
+        var on = b.getAttribute('data-audience-set') === mode;
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      if (hintEl) hintEl.textContent = HINTS[mode] || '';
+    }
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        apply(b.getAttribute('data-audience-set'));
+      });
+    });
+    apply(root.dataset.audience === 'expert' ? 'expert' : 'parent');
+  })();
+</script>
+
+<style>
+  .audience-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+  }
+  .at-label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .at-buttons {
+    display: inline-flex;
+    background: var(--bg);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .at-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .at-btn[aria-pressed='true'] {
+    background: var(--accent);
+    color: #fff;
+  }
+  .at-hint {
+    flex-basis: 100%;
+    margin: 2px 0 0;
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+  }
+</style>

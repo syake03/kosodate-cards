@@ -1,0 +1,41 @@
+---
+import { IMPACT, type ImpactId } from '../lib/taxonomy';
+
+interface Props {
+  impact: ImpactId;
+  showLabel?: boolean;
+}
+const { impact, showLabel = true } = Astro.props;
+const meta = IMPACT[impact];
+---
+
+<span class="im-badge" style={`--c: var(${meta.colorVar})`} title={`影響度：${meta.label}`}>
+  <span class="im-dot" aria-hidden="true"></span>
+  <span class="im-label">{meta.label}</span>
+  {showLabel && <span class="im-sub">リスク</span>}
+</span>
+
+<style>
+  .im-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--c);
+    border: 1px solid var(--c);
+    border-radius: 5px;
+    padding: 1px 8px;
+    font-weight: 500;
+  }
+  .im-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c);
+    flex: none;
+  }
+  .im-sub {
+    color: var(--ink-soft);
+    font-size: 0.72rem;
+  }
+</style>

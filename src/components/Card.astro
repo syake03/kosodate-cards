@@ -1,0 +1,97 @@
+---
+import EvidenceBadge from './EvidenceBadge.astro';
+import ImpactBadge from './ImpactBadge.astro';
+import MiniMatrix from './MiniMatrix.astro';
+import { domainLabel, type EvidenceId, type ImpactId } from '../lib/taxonomy';
+
+interface Props {
+  id: string;
+  title: string;
+  statement: string;
+  domain: string;
+  evidence: EvidenceId;
+  impact: ImpactId;
+  featured?: boolean;
+}
+const { id, title, statement, domain, evidence, impact, featured = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const href = `${base}card/${id}/`;
+---
+
+<article class:list={['card', { featured }]}>
+  <a class="card-link" href={href} aria-label={`カード：${title}`}>
+    <div class="card-top">
+      <span class="card-domain">{domainLabel(domain)}</span>
+      <MiniMatrix evidence={evidence} impact={impact} />
+    </div>
+    <h3 class="card-title">{title}</h3>
+    <p class="card-statement">{statement}</p>
+    <div class="card-badges">
+      <EvidenceBadge evidence={evidence} />
+      <ImpactBadge impact={impact} />
+    </div>
+  </a>
+</article>
+
+<style>
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .card.featured {
+    border-left: 4px solid var(--impact-critical);
+  }
+  .card-link {
+    display: block;
+    padding: 18px 18px 16px;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .card-domain {
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: var(--accent-weak);
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .card-title {
+    font-size: 1.12rem;
+    margin: 0 0 8px;
+  }
+  .card-statement {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px 14px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+</style>

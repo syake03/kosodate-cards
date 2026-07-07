@@ -1,0 +1,164 @@
+---
+import Base from '../../layouts/Base.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import { getVisibleCards, sortByPriority } from '../../lib/cards';
+import { AGES, type AgeId } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  return AGES.map((a) => ({ params: { age: a.id }, props: { age: a } }));
+}
+
+const { age } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const all = await getVisibleCards();
+const cards = sortByPriority(all.filter((c) => c.data.ages.includes(age.id as AgeId)));
+
+// 縦タイムラインの現在位置表示用
+const idx = AGES.findIndex((a) => a.id === age.id);
+---
+
+<Base title={`${age.label}のカード`} description={`${age.label}（${age.hint}）に該当する「子育ての地図」のカード。`}>
+  <nav class="crumbs" aria-label="パンくず">
+    <a href={base}>ホーム</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">年齢：{age.label}</span>
+  </nav>
+
+  <div class="age-layout">
+    <aside class="timeline" aria-label="年齢タイムライン">
+      <ol>
+        {
+          AGES.map((a, i) => (
+            <li class:list={['tl-item', { current: a.id === age.id }]}>
+              <a href={`${base}age/${a.id}/`}>
+                <span class="tl-dot" aria-hidden="true" />
+                <span class="tl-label">{a.label}</span>
+                <span class="tl-hint">{a.hint}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </aside>
+
+    <div class="age-main">
+      <header class="view-head">
+        <p class="view-kicker">年齢から見る（{idx + 1} / {AGES.length}）</p>
+        <h1 class="view-title">{age.label}</h1>
+        <p class="view-desc">{age.hint}。影響度（致命的→重大→QOL）の順に並べています。</p>
+      </header>
+      <CardGrid cards={cards} empty={`${age.label}のカードはまだありません。`} />
+    </div>
+  </div>
+
+  <style>
+    .crumbs {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .crumbs a {
+      text-decoration: none;
+    }
+    .age-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .timeline ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    .timeline ol::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--line);
+    }
+    .tl-item a {
+      display: grid;
+      grid-template-columns: 16px 1fr;
+      gap: 2px 10px;
+      align-items: center;
+      text-decoration: none;
+      color: var(--ink-soft);
+      padding: 6px 0;
+    }
+    .tl-dot {
+      grid-row: span 2;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--line);
+      background: var(--bg);
+      z-index: 1;
+    }
+    .tl-label {
+      font-size: 0.88rem;
+    }
+    .tl-hint {
+      font-size: 0.68rem;
+      opacity: 0.75;
+    }
+    .tl-item.current a {
+      color: var(--accent);
+    }
+    .tl-item.current .tl-dot {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+    .tl-item.current .tl-label {
+      font-weight: 700;
+    }
+    .view-head {
+      margin-bottom: 20px;
+    }
+    .view-kicker {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin: 0 0 4px;
+    }
+    .view-title {
+      font-size: 1.7rem;
+      margin: 0 0 6px;
+    }
+    .view-desc {
+      color: var(--ink-soft);
+      margin: 0;
+    }
+    @media (max-width: 720px) {
+      .age-layout {
+        grid-template-columns: 1fr;
+      }
+      .timeline ol {
+        display: flex;
+        overflow-x: auto;
+        gap: 4px;
+      }
+      .timeline ol::before {
+        display: none;
+      }
+      .tl-item a {
+        grid-template-columns: 1fr;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 4px 12px;
+      }
+      .tl-dot {
+        display: none;
+      }
+      .tl-hint {
+        display: none;
+      }
+    }
+  </style>
+</Base>

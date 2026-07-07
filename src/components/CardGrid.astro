@@ -1,0 +1,57 @@
+---
+import Card from './Card.astro';
+import type { EvidenceId, ImpactId } from '../lib/taxonomy';
+
+interface CardData {
+  id: string;
+  data: {
+    title: string;
+    statement: string;
+    domain: string;
+    evidence: EvidenceId;
+    impact: ImpactId;
+  };
+}
+interface Props {
+  cards: CardData[];
+  featured?: boolean;
+  empty?: string;
+}
+const { cards, featured = false, empty = 'このビューに該当するカードはまだありません。' } = Astro.props;
+---
+
+{
+  cards.length === 0 ? (
+    <p class="grid-empty">{empty}</p>
+  ) : (
+    <div class="card-grid">
+      {cards.map((c) => (
+        <Card
+          id={c.id}
+          title={c.data.title}
+          statement={c.data.statement}
+          domain={c.data.domain}
+          evidence={c.data.evidence}
+          impact={c.data.impact}
+          featured={featured}
+        />
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .grid-empty {
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+  }
+</style>

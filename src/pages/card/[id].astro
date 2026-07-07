@@ -1,0 +1,287 @@
+---
+import { marked } from 'marked';
+import Base from '../../layouts/Base.astro';
+import EvidenceBadge from '../../components/EvidenceBadge.astro';
+import ImpactBadge from '../../components/ImpactBadge.astro';
+import MiniMatrix from '../../components/MiniMatrix.astro';
+import AudienceToggle from '../../components/AudienceToggle.astro';
+import { getVisibleCards } from '../../lib/cards';
+import {
+  EVIDENCE,
+  IMPACT,
+  domainLabel,
+  ageLabel,
+} from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  const cards = await getVisibleCards();
+  return cards.map((card) => ({ params: { id: card.id }, props: { card } }));
+}
+
+const { card } = Astro.props;
+const d = card.data;
+const base = import.meta.env.BASE_URL;
+
+// 本文（生Markdown）を「## 見出し」で分割し、セクション単位で並べ替え・出し分けする。
+// カードは全て同じ見出し構成（なぜ／どうする／よくある誤解／出典）を前提にしている。
+function sections(md: string) {
+  const map: Record<string, string> = {};
+  const parts = md.split(/\n(?=##\s)/);
+  for (const p of parts) {
+    const m = p.match(/^##\s+(.+)/);
+    if (!m) continue;
+    const heading = m[1].trim();
+    const body = p.replace(/^##\s+.+\n?/, '');
+    map[heading] = marked.parse(body) as string;
+  }
+  return map;
+}
+function pick(map: Record<string, string>, keyword: string): string {
+  const key = Object.keys(map).find((k) => k.includes(keyword));
+  return key ? map[key] : '';
+}
+
+const secs = sections(card.body ?? '');
+const why = pick(secs, 'なぜ');
+const practice = pick(secs, 'どうする');
+const myths = pick(secs, '誤解');
+const sources = pick(secs, '出典');
+
+const issueUrl = `https://github.com/syake03/kosodate-cards/issues/new?title=${encodeURIComponent(
+  `[カード指摘] ${d.title}`
+)}`;
+---
+
+<Base title={d.title} description={d.statement}>
+  <nav class="crumbs" aria-label="パンくず">
+    <a href={base}>ホーム</a>
+    <span aria-hidden="true">/</span>
+    <a href={`${base}domain/${d.domain}/`}>{domainLabel(d.domain)}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{d.title}</span>
+  </nav>
+
+  <article class="card-detail" data-pagefind-body>
+    <header class="cd-head">
+      <div class="cd-head-top">
+        <span class="cd-domain">{domainLabel(d.domain)}</span>
+        <MiniMatrix evidence={d.evidence} impact={d.impact} />
+      </div>
+      <h1 class="cd-title" data-pagefind-meta="title">{d.title}</h1>
+      <p class="cd-statement">{d.statement}</p>
+
+      <div class="cd-badges">
+        <EvidenceBadge evidence={d.evidence} />
+        <ImpactBadge impact={d.impact} />
+      </div>
+      <p class="cd-badge-desc">
+        <strong>エビデンス{d.evidence === 'observational' ? '（相関どまり）' : d.evidence}：</strong>{EVIDENCE[d.evidence].desc}
+        <br />
+        <strong>影響度（{IMPACT[d.impact].label}）：</strong>{IMPACT[d.impact].desc}
+      </p>
+
+      <ul class="cd-ages" aria-label="該当年齢">
+        {d.ages.map((a) => <li><a href={`${base}age/${a}/`}>{ageLabel(a)}</a></li>)}
+      </ul>
+    </header>
+
+    <AudienceToggle />
+
+    <div class="cd-body">
+      {
+        practice && (
+          <section class="sec sec-practice">
+            <h2>具体的にどうする</h2>
+            <Fragment set:html={practice} />
+          </section>
+        )
+      }
+      {
+        myths && (
+          <section class="sec sec-myths">
+            <h2>よくある誤解・俗説</h2>
+            <Fragment set:html={myths} />
+          </section>
+        )
+      }
+      {
+        why && (
+          <section class="sec sec-why">
+            <h2>なぜ（背景）</h2>
+            <Fragment set:html={why} />
+          </section>
+        )
+      }
+      {
+        d.confidence_note && (
+          <aside class="sec sec-confidence expert-only" aria-label="エビデンスの留保">
+            <h2>エビデンスの留保・限界</h2>
+            <p>{d.confidence_note}</p>
+          </aside>
+        )
+      }
+      {
+        sources && (
+          <section class="sec sec-sources">
+            <h2>出典</h2>
+            <Fragment set:html={sources} />
+          </section>
+        )
+      }
+    </div>
+
+    <footer class="cd-foot">
+      <p class="cd-updated">最終更新日：{d.updated}（掲載時点の理解です。最新の学会見解と異なる場合があります）</p>
+      <p class="cd-issue">
+        誤り・古い情報に気づいたら
+        <a href={issueUrl} rel="nofollow noopener" target="_blank">GitHub Issue で指摘</a>してください。
+      </p>
+    </footer>
+  </article>
+
+  <style>
+    .crumbs {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .crumbs a {
+      text-decoration: none;
+    }
+    .card-detail {
+      max-width: 760px;
+    }
+    .cd-head {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+      margin-bottom: 18px;
+    }
+    .cd-head-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .cd-domain {
+      font-size: 0.78rem;
+      color: var(--accent);
+      background: var(--accent-weak);
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    .cd-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin: 0 0 12px;
+    }
+    .cd-statement {
+      font-size: 1.08rem;
+      line-height: 1.9;
+      background: var(--accent-weak);
+      border-left: 4px solid var(--accent);
+      padding: 14px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 0 0 18px;
+    }
+    .cd-badges {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .cd-badge-desc {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      margin: 0 0 14px;
+      line-height: 1.7;
+    }
+    .cd-ages {
+      list-style: none;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0;
+      margin: 0;
+    }
+    .cd-ages a {
+      font-size: 0.78rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 10px;
+      text-decoration: none;
+      color: var(--ink-soft);
+    }
+    .cd-ages a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* 本文：セクションを flex で並べ、モードごとに order と表示を切り替える */
+    .cd-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 22px;
+    }
+    .sec {
+      padding: 6px 0 14px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .sec h2 {
+      font-size: 1.2rem;
+      margin: 0 0 8px;
+    }
+    .sec :global(ul) {
+      padding-left: 1.2em;
+    }
+    .sec :global(li) {
+      margin-bottom: 6px;
+    }
+    .sec :global(p) {
+      margin: 0 0 10px;
+    }
+    .sec-confidence {
+      background: #fbf7ee;
+      border: 1px solid var(--ev-c);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .sec-confidence h2 {
+      font-size: 1.05rem;
+      color: #8a6d14;
+    }
+    .sec-confidence p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* 既定（本人向け）：どうする→誤解→なぜ→出典。専門家限定は隠す。 */
+    :global(html[data-audience='parent']) .sec-practice { order: 1; }
+    :global(html[data-audience='parent']) .sec-myths { order: 2; }
+    :global(html[data-audience='parent']) .sec-why { order: 3; }
+    :global(html[data-audience='parent']) .sec-sources { order: 5; }
+    :global(html[data-audience='parent']) .expert-only { display: none; }
+
+    /* 専門家向け：なぜ→留保→どうする→誤解→出典。すべて展開。 */
+    :global(html[data-audience='expert']) .sec-why { order: 1; }
+    :global(html[data-audience='expert']) .sec-confidence { order: 2; }
+    :global(html[data-audience='expert']) .sec-practice { order: 3; }
+    :global(html[data-audience='expert']) .sec-myths { order: 4; }
+    :global(html[data-audience='expert']) .sec-sources { order: 5; }
+
+    .cd-foot {
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+    }
+    .cd-issue-note {
+      display: block;
+      font-size: 0.72rem;
+      opacity: 0.8;
+    }
+  </style>
+</Base>

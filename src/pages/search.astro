@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL;
+// Pagefind はビルド時に dist/pagefind/ を生成する。base 付きで読み込む。
+const pagefindUI = `${base}pagefind/pagefind-ui.js`;
+const pagefindCSS = `${base}pagefind/pagefind-ui.css`;
+---
+
+<Base title="検索" description="全カードを横断して全文検索します。">
+  <link rel="stylesheet" href={pagefindCSS} />
+  <article class="doc">
+    <h1>カードを検索</h1>
+    <p class="lead">キーワードで全カードを横断検索します（例：SIDS、離乳食、はちみつ、予防接種）。</p>
+    <div id="search"></div>
+    <p class="note">
+      検索インデックスは<strong>ビルド後の公開サイトで有効</strong>です。ローカルの <code>npm run dev</code> では動きません。
+      <code>npm run build</code> 後に <code>npm run preview</code> で確認できます。
+    </p>
+  </article>
+
+  <script is:inline define:vars={{ pagefindUI, base }}>
+    window.addEventListener('DOMContentLoaded', () => {
+      import(pagefindUI)
+        .then(({ PagefindUI }) => {
+          new PagefindUI({
+            element: '#search',
+            showSubResults: true,
+            showImages: false,
+            bundlePath: base + 'pagefind/',
+            translations: {
+              placeholder: 'カードを検索',
+              zero_results: '「[SEARCH_TERM]」に一致するカードはありません',
+            },
+          });
+        })
+        .catch(() => {
+          document.getElementById('search').innerHTML =
+            '<p class="note">検索モジュールを読み込めませんでした。公開サイト（ビルド後）でお試しください。</p>';
+        });
+    });
+  </script>
+
+  <style>
+    .doc {
+      max-width: 720px;
+    }
+    .doc h1 {
+      font-size: 2rem;
+      margin: 0 0 10px;
+    }
+    .lead {
+      color: var(--ink-soft);
+    }
+    .note {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 20px;
+    }
+    code {
+      font-family: var(--font-mono);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+    }
+    :global(:root) {
+      --pagefind-ui-primary: var(--accent);
+      --pagefind-ui-text: var(--ink);
+      --pagefind-ui-background: var(--surface);
+      --pagefind-ui-border: var(--line);
+      --pagefind-ui-font: var(--font-body);
+    }
+  </style>
+</Base>

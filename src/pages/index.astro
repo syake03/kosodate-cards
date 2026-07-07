@@ -1,0 +1,190 @@
+---
+import Base from '../layouts/Base.astro';
+import CardGrid from '../components/CardGrid.astro';
+import Matrix from '../components/Matrix.astro';
+import { getVisibleCards, sortByPriority, essentials } from '../lib/cards';
+import { DOMAINS, AGES } from '../lib/taxonomy';
+
+const base = import.meta.env.BASE_URL;
+const cards = await getVisibleCards();
+const essentialCards = sortByPriority(essentials(cards));
+const points = cards.map((c) => ({
+  id: c.id,
+  title: c.data.title,
+  evidence: c.data.evidence,
+  impact: c.data.impact,
+}));
+
+// カードが存在する領域・年齢だけ入口に強調表示する
+const domainHas = new Set(cards.map((c) => c.data.domain));
+const ageHas = new Set(cards.flatMap((c) => c.data.ages));
+---
+
+<Base>
+  <section class="hero">
+    <p class="hero-kicker">妊娠期から独り立ちまで、エビデンスでえがく</p>
+    <h1 class="hero-title">子育ての地図</h1>
+    <p class="hero-lead">
+      迷いやすい子育てを、一枚の地図に。これは医学の「標準治療」の子育て版です。現在の科学的根拠に基づき、多くの人にとって利益が大きいと考えられ、専門家の間で推奨されているやり方を、
+      <strong>エビデンス強度</strong>と<strong>影響度</strong>の2軸で構造化して無料公開します。
+    </p>
+    <p class="hero-note">
+      これは一般的な情報提供であり、個別の診断・治療の代替ではありません。詳しくは
+      <a href={`${base}disclaimer/`}>免責事項</a>と<a href={`${base}methodology/`}>評価基準</a>をご覧ください。
+    </p>
+  </section>
+
+  <section class="section" aria-labelledby="essentials-h">
+    <div class="section-head">
+      <h2 id="essentials-h" class="section-title">The Essentials（絶対リスト）</h2>
+      <p class="section-desc">
+        <strong>エビデンスA × 致命的リスク</strong>のカードだけを自動抽出。「最低限これだけは」という命綱リストです。
+      </p>
+    </div>
+    <CardGrid cards={essentialCards} featured empty="絶対リスト（A×致命的）のカードはまだありません。" />
+  </section>
+
+  <section class="section" aria-labelledby="entry-h">
+    <h2 id="entry-h" class="section-title">2つの入口から探す</h2>
+    <div class="entries">
+      <a class="entry" href={`${base}age/0-1/`}>
+        <span class="entry-mark">年齢から見る</span>
+        <span class="entry-sub">妊娠期〜独り立ちまで、時期ごとに引く</span>
+        <span class="entry-tags">
+          {AGES.map((a) => (
+            <span class:list={['tag', { on: ageHas.has(a.id) }]}>{a.label}</span>
+          ))}
+        </span>
+      </a>
+      <a class="entry" href={`${base}domain/safety-sleep/`}>
+        <span class="entry-mark">領域から見る</span>
+        <span class="entry-sub">安全・栄養・医療など10領域で引く</span>
+        <span class="entry-tags">
+          {DOMAINS.map((d) => (
+            <span class:list={['tag', { on: domainHas.has(d.id) }]}>{d.label}</span>
+          ))}
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="matrix-h">
+    <div class="section-head">
+      <h2 id="matrix-h" class="section-title">俯瞰マトリクス</h2>
+      <p class="section-desc">全カードを「エビデンス強度 × 影響度」でプロット。サイトの全体像を一目で。</p>
+    </div>
+    <Matrix cards={points} />
+  </section>
+
+  <section class="section about-strip">
+    <h2 class="section-title">このサイトについて</h2>
+    <p>
+      根拠が弱い項目は「弱い」と正直に書き、俗説は「俗説」と明示します。AI（Claude）の調査補助で作成し、随時更新します。
+      作り方・限界は<a href={`${base}about/`}>このサイトについて</a>、評価の基準は<a href={`${base}methodology/`}>評価基準</a>に公開しています。
+    </p>
+  </section>
+
+  <style>
+    .hero {
+      padding: 20px 0 8px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 40px;
+    }
+    .hero-kicker {
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      margin: 0 0 6px;
+    }
+    .hero-title {
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      margin: 0 0 16px;
+      letter-spacing: 0.02em;
+    }
+    .hero-lead {
+      font-size: 1.05rem;
+      max-width: 62ch;
+      margin: 0 0 14px;
+    }
+    .hero-note {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      max-width: 62ch;
+    }
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-head {
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin: 0 0 8px;
+    }
+    .section-desc {
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 64ch;
+    }
+    .entries {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .entry {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s ease;
+    }
+    .entry:hover {
+      border-color: var(--accent);
+    }
+    .entry-mark {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--accent);
+    }
+    .entry-sub {
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+    }
+    .entry-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .tag {
+      font-size: 0.72rem;
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 1px 8px;
+    }
+    .tag.on {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-weak);
+    }
+    .about-strip {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .about-strip p {
+      margin: 0;
+      color: var(--ink-soft);
+      max-width: 70ch;
+    }
+  </style>
+</Base>

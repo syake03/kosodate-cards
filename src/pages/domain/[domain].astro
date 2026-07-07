@@ -1,0 +1,143 @@
+---
+import Base from '../../layouts/Base.astro';
+import CardGrid from '../../components/CardGrid.astro';
+import { getVisibleCards, sortByPriority } from '../../lib/cards';
+import { DOMAINS, type DomainId } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  return DOMAINS.map((d) => ({ params: { domain: d.id }, props: { domain: d } }));
+}
+
+const { domain } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const all = await getVisibleCards();
+const cards = sortByPriority(all.filter((c) => c.data.domain === (domain.id as DomainId)));
+const countByDomain = (id: string) => all.filter((c) => c.data.domain === id).length;
+---
+
+<Base title={`${domain.label}のカード`} description={`${domain.label}：${domain.desc}`}>
+  <nav class="crumbs" aria-label="パンくず">
+    <a href={base}>ホーム</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">領域：{domain.label}</span>
+  </nav>
+
+  <div class="domain-layout">
+    <aside class="dom-nav" aria-label="領域一覧">
+      <p class="dom-nav-title">10の領域</p>
+      <ul>
+        {
+          DOMAINS.map((dd) => {
+            const n = countByDomain(dd.id);
+            return (
+              <li>
+                <a href={`${base}domain/${dd.id}/`} aria-current={dd.id === domain.id ? 'page' : undefined}>
+                  <span>{dd.label}</span>
+                  <span class="dom-count">{n}</span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </aside>
+
+    <div class="dom-main">
+      <header class="view-head">
+        <p class="view-kicker">領域から見る</p>
+        <h1 class="view-title">{domain.label}</h1>
+        <p class="view-desc">{domain.desc}</p>
+      </header>
+      <CardGrid cards={cards} empty={`${domain.label}のカードはまだありません。`} />
+    </div>
+  </div>
+
+  <style>
+    .crumbs {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .crumbs a {
+      text-decoration: none;
+    }
+    .domain-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .dom-nav-title {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      margin: 0 0 8px;
+      letter-spacing: 0.04em;
+    }
+    .dom-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .dom-nav a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      padding: 7px 10px;
+      border-radius: 7px;
+    }
+    .dom-nav a:hover {
+      background: var(--accent-weak);
+      color: var(--accent);
+    }
+    .dom-nav a[aria-current='page'] {
+      background: var(--accent);
+      color: #fff;
+    }
+    .dom-count {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      opacity: 0.85;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 999px;
+      padding: 0 7px;
+    }
+    .dom-nav a[aria-current='page'] .dom-count {
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .view-head {
+      margin-bottom: 20px;
+    }
+    .view-kicker {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin: 0 0 4px;
+    }
+    .view-title {
+      font-size: 1.7rem;
+      margin: 0 0 6px;
+    }
+    .view-desc {
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 60ch;
+    }
+    @media (max-width: 720px) {
+      .domain-layout {
+        grid-template-columns: 1fr;
+      }
+      .dom-nav ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</Base>

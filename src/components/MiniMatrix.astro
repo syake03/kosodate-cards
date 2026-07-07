@@ -1,0 +1,51 @@
+---
+import {
+  EVIDENCE_ORDER,
+  IMPACT_ORDER,
+  type EvidenceId,
+  type ImpactId,
+} from '../lib/taxonomy';
+
+// カード右上に置く 4×3 のミニマトリクス（SPEC §6 シグネチャー要素）。
+// このカードが「エビデンス×影響度」のどこに位置するかを一目で示す。
+interface Props {
+  evidence: EvidenceId;
+  impact: ImpactId;
+}
+const { evidence, impact } = Astro.props;
+---
+
+<div
+  class="mini-matrix"
+  role="img"
+  aria-label={`このカードの位置：エビデンス${evidence}・影響度${impact}`}
+>
+  {
+    IMPACT_ORDER.map((im) =>
+      EVIDENCE_ORDER.map((ev) => {
+        const on = ev === evidence && im === impact;
+        return <span class:list={['cell', { on }]} />;
+      })
+    )
+  }
+</div>
+
+<style>
+  .mini-matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 7px);
+    grid-auto-rows: 7px;
+    gap: 3px;
+    flex: none;
+  }
+  .cell {
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .cell.on {
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-weak);
+  }
+</style>

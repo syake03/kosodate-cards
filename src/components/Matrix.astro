@@ -1,0 +1,183 @@
+---
+import {
+  EVIDENCE,
+  IMPACT,
+  EVIDENCE_ORDER,
+  IMPACT_ORDER,
+  type EvidenceId,
+  type ImpactId,
+} from '../lib/taxonomy';
+
+// 全カードを2軸にプロットする俯瞰マトリクス（SPEC §6 / §7.1-4）。
+interface CardPoint {
+  id: string;
+  title: string;
+  evidence: EvidenceId;
+  impact: ImpactId;
+}
+interface Props {
+  cards: CardPoint[];
+}
+const { cards } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+// セル（impact × evidence）ごとにカードをまとめる
+function cellCards(ev: EvidenceId, im: ImpactId) {
+  return cards.filter((c) => c.evidence === ev && c.impact === im);
+}
+---
+
+<div class="matrix" role="table" aria-label="全カードのエビデンス強度×影響度マトリクス">
+  <div class="m-corner" role="presentation">
+    <span class="axis-y">影響度 ↓</span>
+    <span class="axis-x">エビデンス →</span>
+  </div>
+  {
+    EVIDENCE_ORDER.map((ev) => (
+      <div class="m-head" role="columnheader">
+        <span class="m-head-mark" style={`--c: var(${EVIDENCE[ev].colorVar})`}>
+          {EVIDENCE[ev].short}
+        </span>
+        <span class="m-head-label">{EVIDENCE[ev].label}</span>
+      </div>
+    ))
+  }
+
+  {
+    IMPACT_ORDER.map((im) => (
+      <>
+        <div class="m-row-head" role="rowheader">
+          <span class="im-swatch" style={`--c: var(${IMPACT[im].colorVar})`} />
+          {IMPACT[im].label}
+        </div>
+        {EVIDENCE_ORDER.map((ev) => {
+          const list = cellCards(ev, im);
+          const essential = ev === 'A' && im === 'critical';
+          return (
+            <div class:list={['m-cell', { essential }]} role="cell">
+              {list.map((c) => (
+                <a class="m-dot" href={`${base}card/${c.id}/`} title={c.title}>
+                  <span class="m-dot-mark" />
+                  <span class="m-dot-title">{c.title}</span>
+                </a>
+              ))}
+            </div>
+          );
+        })}
+      </>
+    ))
+  }
+</div>
+<p class="matrix-legend">
+  左上（エビデンスA×致命的）ほど「まず守るべき」カード。ドットをクリックすると各カードへ移動します。
+</p>
+
+<style>
+  .matrix {
+    display: grid;
+    grid-template-columns: minmax(72px, auto) repeat(4, 1fr);
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .m-corner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    padding: 4px;
+  }
+  .axis-x {
+    align-self: flex-end;
+  }
+  .m-head {
+    text-align: center;
+    padding: 4px 2px;
+  }
+  .m-head-mark {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: #fff;
+    background: var(--c);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 0.78rem;
+  }
+  .m-head-label {
+    display: block;
+    font-size: 0.66rem;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+  .m-row-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink);
+    padding: 6px 4px;
+  }
+  .im-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--c);
+    flex: none;
+  }
+  .m-cell {
+    min-height: 46px;
+    background: var(--bg);
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-content: flex-start;
+  }
+  .m-cell.essential {
+    background: #fdf3f4;
+    border-color: var(--impact-critical);
+    border-style: solid;
+  }
+  .m-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 8px 2px 6px;
+    font-size: 0.7rem;
+    color: var(--ink);
+    text-decoration: none;
+    max-width: 100%;
+  }
+  .m-dot:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .m-dot-mark {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+  .m-dot-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 12ch;
+  }
+  .matrix-legend {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin: 10px 2px 0;
+  }
+</style>

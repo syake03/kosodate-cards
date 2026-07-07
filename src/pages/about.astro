@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="このサイトについて" description="「子育ての地図」プロジェクトの目的・作り方・限界。">
+  <article class="doc">
+    <h1>このサイトについて</h1>
+    <p class="lead">
+      医学における「標準治療」の子育て版です。現在の科学的根拠に基づき、多くの人にとって最も利益が大きいと考えられ、専門家の間で推奨されているやり方を、妊娠期から独り立ちまで一貫して構造化し、誰でも無料で見られる形で公開します。
+    </p>
+
+    <section>
+      <h2>何を作っているか</h2>
+      <ul>
+        <li>1つの推奨アクション ＝ 1枚の「カード」。</li>
+        <li>カードは<strong>10領域</strong>と<strong>8つの年齢区分</strong>で整理し、<a href={`${base}domain/safety-sleep/`}>領域別</a>と<a href={`${base}age/0-1/`}>年齢別</a>の両方から引けます。</li>
+        <li>各カードに<strong>エビデンス強度</strong>と<strong>影響度</strong>の2軸評価を必ず付けます（<a href={`${base}methodology/`}>評価基準</a>）。</li>
+        <li>トップに「エビデンスA × 致命的リスク回避」だけを集めた<strong>絶対リスト（The Essentials）</strong>を置いています。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>設計思想</h2>
+      <ol>
+        <li><strong>事実と解釈を分ける。</strong>「推奨内容」と「解釈・注意」を視覚的に分離します。</li>
+        <li><strong>出典を必ず残す。</strong>一次資料へのリンクを各カードに最低1つ。</li>
+        <li><strong>育てる前提。</strong>AI補助で作成し随時更新、間違いの指摘を歓迎します。各カードに更新日と Issue への導線があります。</li>
+        <li><strong>正直であること自体が価値。</strong>根拠が弱い項目は「弱い」と、俗説は「俗説」と明示します。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>作り方（AIと人の分担）</h2>
+      <p>
+        カードは、公的機関・学会・システマティックレビューなどの一次資料を実際に確認しながら作成します。制作手順は<code>docs/CONTENT_SPEC.md</code>に、サイトの実装仕様は<code>docs/SPEC.md</code>に公開しています。調査ログ（<code>research/</code>）も監査できるよう残しています。
+      </p>
+    </section>
+
+    <section>
+      <h2>限界とお願い</h2>
+      <p>
+        本サイトは個別の医療相談・診断・治療の代替にはなりません。緊急時・個別症例は必ず専門家へ。詳しくは<a href={`${base}disclaimer/`}>免責事項</a>をご確認ください。誤りに気づいたら、各カードから GitHub Issue でお知らせください。
+      </p>
+    </section>
+  </article>
+
+  <style>
+    .doc {
+      max-width: 760px;
+    }
+    .doc h1 {
+      font-size: 2rem;
+      margin: 0 0 12px;
+    }
+    .lead {
+      font-size: 1.05rem;
+    }
+    .doc section {
+      margin-top: 30px;
+    }
+    .doc h2 {
+      font-size: 1.35rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+    .doc li {
+      margin-bottom: 8px;
+    }
+    code {
+      font-family: var(--font-mono);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+    }
+  </style>
+</Base>

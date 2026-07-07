@@ -1,0 +1,30 @@
+/* SPEC.md §6 デザイントークン */
+:root {
+  --bg: #fbfaf7; /* 紙のようなオフホワイト */
+  --surface: #ffffff; /* カード面 */
+  --ink: #1f2421; /* 本文（真っ黒を避けた濃い墨色） */
+  --ink-soft: #55605a; /* 補助テキスト */
+  --line: #e4e2da; /* 罫線・区切り */
+  --accent: #2e6f6a; /* 深い緑（信頼・落ち着き） */
+  --accent-weak: #e6efed;
+
+  /* エビデンス強度バッジ（唯一の"派手さ"の置き場所） */
+  --ev-a: #1b7f5a;
+  --ev-b: #6fa03c;
+  --ev-c: #c9a227;
+  --ev-obs: #9aa0a6;
+
+  /* 影響度バッジ */
+  --impact-critical: #b23a48;
+  --impact-serious: #c77d33;
+  --impact-qol: #5b7c99;
+
+  /* タイポ */
+  --font-display: 'Zen Old Mincho', 'Noto Serif JP', serif;
+  --font-body: 'Noto Sans JP', system-ui, -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --maxw: 960px;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(31, 36, 33, 0.05), 0 4px 16px rgba(31, 36, 33, 0.04);
+}

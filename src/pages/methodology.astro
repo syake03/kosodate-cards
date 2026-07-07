@@ -1,0 +1,150 @@
+---
+import Base from '../layouts/Base.astro';
+import { EVIDENCE, IMPACT, EVIDENCE_ORDER, IMPACT_ORDER } from '../lib/taxonomy';
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="評価基準（方法論）" description="エビデンス強度と影響度の分類基準。SPEC §5 をそのまま公開しています。">
+  <article class="doc">
+    <h1>評価基準（方法論）</h1>
+    <p class="lead">
+      各カードには「エビデンス強度」と「影響度」の2軸評価が必ず付きます。判定を書き手の感覚に委ねず、透明性のために基準そのものを公開します。
+    </p>
+
+    <section>
+      <h2>エビデンス強度（4段階）</h2>
+      <p>
+        子育て研究はランダム化比較試験（RCT）が倫理的・実務的に難しく、観察研究が中心です。医学ガイドラインをそのまま当てはめず、この現実に合わせた4段階を用います。
+      </p>
+      <table>
+        <thead>
+          <tr><th>値</th><th>ラベル</th><th>意味</th></tr>
+        </thead>
+        <tbody>
+          {
+            EVIDENCE_ORDER.map((ev) => (
+              <tr>
+                <td>
+                  <span class="mark" style={`--c: var(${EVIDENCE[ev].colorVar})`}>{EVIDENCE[ev].short}</span>
+                </td>
+                <td>{EVIDENCE[ev].label}</td>
+                <td>{EVIDENCE[ev].desc}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="note">
+        「やってはいけない（致命的リスク回避）」系はエビデンスAが集まりやすく、「こうするとより良く育つ」系はC〜相関どまりが多くなります。この非対称性を隠さず、正直に表示することを設計上の方針にしています。
+      </p>
+    </section>
+
+    <section>
+      <h2>影響度（3段階）</h2>
+      <table>
+        <thead>
+          <tr><th>値</th><th>ラベル</th><th>意味</th></tr>
+        </thead>
+        <tbody>
+          {
+            IMPACT_ORDER.map((im) => (
+              <tr>
+                <td><span class="dot" style={`--c: var(${IMPACT[im].colorVar})`} />{im}</td>
+                <td>{IMPACT[im].label}</td>
+                <td>{IMPACT[im].desc}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>The Essentials（絶対リスト）</h2>
+      <p>
+        <strong>エビデンスA × 影響度critical</strong> のカードを自動抽出し、<a href={base}>トップページ</a>の先頭に並べます。「最低限これだけは」という命綱リストで、標準治療コンセプトの中心です。
+      </p>
+    </section>
+
+    <section>
+      <h2>出典のルール</h2>
+      <ul>
+        <li>出典は可能な限り一次資料（学会ガイドライン・公的機関・システマティックレビュー）を用います。</li>
+        <li>各カードに最低1つ、実際に確認した出典リンクを付けます。</li>
+        <li>根拠が弱い項目は「弱い」と、俗説は「俗説」と正直に明記します。</li>
+      </ul>
+      <p>詳しい制作手順は、リポジトリ内の <code>docs/CONTENT_SPEC.md</code> に公開しています。</p>
+    </section>
+  </article>
+
+  <style>
+    .doc {
+      max-width: 760px;
+    }
+    .doc h1 {
+      font-size: 2rem;
+      margin: 0 0 12px;
+    }
+    .lead {
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+    .doc section {
+      margin-top: 32px;
+    }
+    .doc h2 {
+      font-size: 1.35rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.9rem;
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: var(--ink-soft);
+      font-weight: 500;
+      background: var(--surface);
+    }
+    .mark {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #fff;
+      background: var(--c);
+      border-radius: 4px;
+      padding: 1px 8px;
+    }
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--c);
+      margin-right: 8px;
+    }
+    .note {
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      padding: 12px 14px;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+    }
+    code {
+      font-family: var(--font-mono);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.85em;
+    }
+  </style>
+</Base>

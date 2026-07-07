@@ -1,0 +1,38 @@
+---
+import { EVIDENCE, type EvidenceId } from '../lib/taxonomy';
+
+interface Props {
+  evidence: EvidenceId;
+  showLabel?: boolean;
+}
+const { evidence, showLabel = true } = Astro.props;
+const meta = EVIDENCE[evidence];
+---
+
+<span class="ev-badge" style={`--c: var(${meta.colorVar})`} title={`エビデンス強度：${meta.label}`}>
+  <span class="ev-mark">{meta.short}</span>
+  {showLabel && <span class="ev-label">エビデンス{evidence === 'observational' ? '相関どまり' : evidence}・{meta.label}</span>}
+</span>
+
+<style>
+  .ev-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+  }
+  .ev-mark {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: #fff;
+    background: var(--c);
+    border-radius: 5px;
+    padding: 2px 8px;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+  .ev-label {
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+</style>
