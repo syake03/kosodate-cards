@@ -3,11 +3,12 @@ import { impactRank, evidenceRank, type ImpactId, type EvidenceId } from './taxo
 
 export type CardEntry = CollectionEntry<'cards'>;
 
-// 表示対象は draft 以外（review / published）。
-// 既存カード2枚は status: review のため、これで The Essentials に載る。
+// 表示対象は published のみ（PIPELINE.md §1）。
+// draft/review は自動生成・検証中の未確認カードなのでサイトに出さない。
+// review→published への昇格は人間が行う（公開の最終責任は人間が持つ）。
 export async function getVisibleCards(): Promise<CardEntry[]> {
   const all = await getCollection('cards');
-  return all.filter((c) => c.data.status !== 'draft');
+  return all.filter((c) => c.data.status === 'published');
 }
 
 // 影響度（致命的→QOL）→ エビデンス（A→observational）→ タイトル で安定ソート。

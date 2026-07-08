@@ -8,7 +8,7 @@ evidence: "A"
 impact: "serious"
 tags: ["予防接種", "定期接種", "ワクチン", "感染症予防", "スケジュール"]
 updated: "2026-07-06"
-status: "review"
+status: "published"
 confidence_note: "接種の時期・回数・対象ワクチンは国により異なる。本カードは日本の定期接種（予防接種法）に基づく。海外ではBCGや日本脳炎を含めない等、内容が異なる。居住国の公的スケジュールに従うこと。"
 ---
 
