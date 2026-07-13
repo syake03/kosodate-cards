@@ -34,6 +34,30 @@ const ageHas = new Set(cards.flatMap((c) => c.data.ages));
     </p>
   </section>
 
+  <section class="section" aria-labelledby="entry-h">
+    <h2 id="entry-h" class="section-title">2つの入口から探す</h2>
+    <div class="entries">
+      <div class="entry">
+        <a class="entry-mark" href={`${base}age/`}>年齢から見る</a>
+        <span class="entry-sub">妊娠期〜独り立ちまで、時期ごとに引く</span>
+        <span class="entry-tags">
+          {AGES.map((a) => (
+            <a href={`${base}age/${a.id}/`} class:list={['tag', { on: ageHas.has(a.id) }]}>{a.label}</a>
+          ))}
+        </span>
+      </div>
+      <div class="entry">
+        <a class="entry-mark" href={`${base}domain/`}>領域から見る</a>
+        <span class="entry-sub">安全・栄養・医療など10領域で引く</span>
+        <span class="entry-tags">
+          {DOMAINS.map((d) => (
+            <a href={`${base}domain/${d.id}/`} class:list={['tag', { on: domainHas.has(d.id) }]}>{d.label}</a>
+          ))}
+        </span>
+      </div>
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="essentials-h">
     <div class="section-head">
       <h2 id="essentials-h" class="section-title">The Essentials（絶対リスト）</h2>
@@ -42,30 +66,6 @@ const ageHas = new Set(cards.flatMap((c) => c.data.ages));
       </p>
     </div>
     <CardGrid cards={essentialCards} featured empty="絶対リスト（A×致命的）のカードはまだありません。" />
-  </section>
-
-  <section class="section" aria-labelledby="entry-h">
-    <h2 id="entry-h" class="section-title">2つの入口から探す</h2>
-    <div class="entries">
-      <a class="entry" href={`${base}age/0-1/`}>
-        <span class="entry-mark">年齢から見る</span>
-        <span class="entry-sub">妊娠期〜独り立ちまで、時期ごとに引く</span>
-        <span class="entry-tags">
-          {AGES.map((a) => (
-            <span class:list={['tag', { on: ageHas.has(a.id) }]}>{a.label}</span>
-          ))}
-        </span>
-      </a>
-      <a class="entry" href={`${base}domain/safety-sleep/`}>
-        <span class="entry-mark">領域から見る</span>
-        <span class="entry-sub">安全・栄養・医療など10領域で引く</span>
-        <span class="entry-tags">
-          {DOMAINS.map((d) => (
-            <span class:list={['tag', { on: domainHas.has(d.id) }]}>{d.label}</span>
-          ))}
-        </span>
-      </a>
-    </div>
   </section>
 
   <section class="section" aria-labelledby="matrix-h">
@@ -152,6 +152,15 @@ const ageHas = new Set(cards.flatMap((c) => c.data.ages));
       font-weight: 700;
       font-size: 1.25rem;
       color: var(--accent);
+      text-decoration: none;
+      width: fit-content;
+    }
+    .entry-mark::after {
+      content: ' →';
+      font-size: 0.9em;
+    }
+    .entry-mark:hover {
+      text-decoration: underline;
     }
     .entry-sub {
       color: var(--ink-soft);
@@ -169,6 +178,11 @@ const ageHas = new Set(cards.flatMap((c) => c.data.ages));
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 1px 8px;
+      text-decoration: none;
+    }
+    .tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
     .tag.on {
       color: var(--accent);

@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getVisibleCards } from '../../lib/cards';
+import { AGES } from '../../lib/taxonomy';
+
+const base = import.meta.env.BASE_URL;
+const all = await getVisibleCards();
+const countByAge = (id: string) => all.filter((c) => c.data.ages.includes(id as never)).length;
+---
+
+<Base title="年齢から探す" description="妊娠期から独り立ちまで、お子さんの年齢に合ったカードを探せます。">
+  <nav class="crumbs" aria-label="パンくず">
+    <a href={base}>ホーム</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">年齢から探す</span>
+  </nav>
+
+  <header class="view-head">
+    <p class="view-kicker">年齢から見る</p>
+    <h1 class="view-title">お子さんの年齢を選んでください</h1>
+    <p class="view-desc">妊娠期から独り立ちまでの8区分。1枚のカードが複数の年齢にまたがることもあります。</p>
+  </header>
+
+  <ul class="age-list">
+    {
+      AGES.map((a) => {
+        const n = countByAge(a.id);
+        return (
+          <li>
+            <a class="age-item" href={`${base}age/${a.id}/`}>
+              <span class="age-label">{a.label}</span>
+              <span class="age-hint">{a.hint}</span>
+              <span class="age-count">{n}枚</span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <style>
+    .crumbs {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .crumbs a {
+      text-decoration: none;
+    }
+    .view-head {
+      margin-bottom: 24px;
+    }
+    .view-kicker {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin: 0 0 4px;
+    }
+    .view-title {
+      font-size: 1.7rem;
+      margin: 0 0 6px;
+    }
+    .view-desc {
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 60ch;
+    }
+    .age-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      max-width: 900px;
+    }
+    .age-item {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      text-decoration: none;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+      color: var(--ink);
+    }
+    .age-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-weak);
+    }
+    .age-label {
+      font-family: var(--font-display, inherit);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--accent);
+    }
+    .age-hint {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+    }
+    .age-count {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 1px 9px;
+    }
+  </style>
+</Base>

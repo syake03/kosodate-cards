@@ -1,0 +1,122 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getVisibleCards } from '../../lib/cards';
+import { DOMAINS } from '../../lib/taxonomy';
+
+const base = import.meta.env.BASE_URL;
+const all = await getVisibleCards();
+const countByDomain = (id: string) => all.filter((c) => c.data.domain === id).length;
+---
+
+<Base title="領域から探す" description="安全・栄養・医療から性教育・お金まで、10の領域からカードを探せます。">
+  <nav class="crumbs" aria-label="パンくず">
+    <a href={base}>ホーム</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">領域から探す</span>
+  </nav>
+
+  <header class="view-head">
+    <p class="view-kicker">領域から見る</p>
+    <h1 class="view-title">気になる領域を選んでください</h1>
+    <p class="view-desc">子育ての全体を10の領域に分けています。数字は現在のカード数です。</p>
+  </header>
+
+  <ul class="domain-list">
+    {
+      DOMAINS.map((d) => {
+        const n = countByDomain(d.id);
+        return (
+          <li>
+            <a class="domain-item" href={`${base}domain/${d.id}/`}>
+              <span class="domain-head">
+                <span class="domain-label">{d.label}</span>
+                <span class="domain-count">{n}枚</span>
+              </span>
+              <span class="domain-desc">{d.desc}</span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <style>
+    .crumbs {
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .crumbs a {
+      text-decoration: none;
+    }
+    .view-head {
+      margin-bottom: 24px;
+    }
+    .view-kicker {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin: 0 0 4px;
+    }
+    .view-title {
+      font-size: 1.7rem;
+      margin: 0 0 6px;
+    }
+    .view-desc {
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 60ch;
+    }
+    .domain-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .domain-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-decoration: none;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+      color: var(--ink);
+      height: 100%;
+    }
+    .domain-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-weak);
+    }
+    .domain-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .domain-label {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent);
+    }
+    .domain-count {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 1px 9px;
+      flex: none;
+    }
+    .domain-desc {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+  </style>
+</Base>
