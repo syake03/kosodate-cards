@@ -9,10 +9,10 @@ const { impact, showLabel = true } = Astro.props;
 const meta = IMPACT[impact];
 ---
 
-<span class="im-badge" style={`--c: var(${meta.colorVar})`} title={`影響度：${meta.label}`}>
+<span class="im-badge" style={`--c: var(${meta.colorVar})`} title={`影響度：${meta.label}（${meta.desc}）`}>
   <span class="im-dot" aria-hidden="true"></span>
   <span class="im-label">{meta.label}</span>
-  {showLabel && <span class="im-sub">リスク</span>}
+  {showLabel && impact !== 'qol' && <span class="im-sub">リスク</span>}
 </span>
 
 <style>

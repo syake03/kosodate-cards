@@ -12,6 +12,8 @@ const pageTitle = title ? `${title}｜${siteName}` : siteName;
 const desc =
   description ??
   '医学の「標準治療」の子育て版。エビデンスに基づく推奨を、エビデンス強度と影響度の2軸で構造化して無料公開します。';
+// OGP・canonical 用の絶対URL（astro.config.mjs の site + 現在パス）
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 const nav = [
   { href: `${base}`, label: 'ホーム' },
@@ -30,6 +32,15 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -114,8 +114,8 @@ const issueUrl = `https://github.com/syake03/kosodate-cards/issues/new?title=${e
       }
       {
         d.confidence_note && (
-          <aside class="sec sec-confidence expert-only" aria-label="エビデンスの留保">
-            <h2>エビデンスの留保・限界</h2>
+          <aside class="sec sec-confidence" aria-label="知っておいてほしい限界">
+            <h2>知っておいてほしいこと（この推奨の限界）</h2>
             <p>{d.confidence_note}</p>
           </aside>
         )
@@ -259,10 +259,11 @@ const issueUrl = `https://github.com/syake03/kosodate-cards/issues/new?title=${e
       font-size: 0.9rem;
     }
 
-    /* 既定（本人向け）：どうする→誤解→なぜ→出典。専門家限定は隠す。 */
+    /* 既定（本人向け）：どうする→誤解→なぜ→限界→出典。専門家限定は隠す。 */
     :global(html[data-audience='parent']) .sec-practice { order: 1; }
     :global(html[data-audience='parent']) .sec-myths { order: 2; }
     :global(html[data-audience='parent']) .sec-why { order: 3; }
+    :global(html[data-audience='parent']) .sec-confidence { order: 4; }
     :global(html[data-audience='parent']) .sec-sources { order: 5; }
     :global(html[data-audience='parent']) .expert-only { display: none; }
 

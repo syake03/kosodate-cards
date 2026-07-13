@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://syake03.github.io/kosodate-cards/sitemap-index.xml

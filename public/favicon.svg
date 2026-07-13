@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 子育ての地図：深緑の角丸タイルに地図ピン -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#2e6f6a"/>
+  <path d="M32 12c-8.3 0-15 6.5-15 14.6C17 37.8 32 52 32 52s15-14.2 15-25.4C47 18.5 40.3 12 32 12z" fill="#ffffff"/>
+  <circle cx="32" cy="27" r="6.5" fill="#2e6f6a"/>
+</svg>

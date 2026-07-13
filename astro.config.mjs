@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // GitHub Pages で公開するときは以下を自分の値に合わせて更新する。
 //   site: 'https://<あなたのGitHubユーザー名>.github.io'
@@ -8,6 +9,7 @@ export default defineConfig({
   site: 'https://syake03.github.io',
   base: '/kosodate-cards/',
   trailingSlash: 'ignore',
+  integrations: [sitemap()],
   build: {
     format: 'directory',
   },
