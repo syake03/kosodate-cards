@@ -11,7 +11,7 @@ const siteName = '子育ての地図';
 const pageTitle = title ? `${title}｜${siteName}` : siteName;
 const desc =
   description ??
-  '医学の「標準治療」の子育て版。エビデンスに基づく推奨を、エビデンス強度と影響度の2軸で構造化して無料公開します。';
+  '今ある科学的根拠の中で確かめられている「現時点の最善」の子育てを、エビデンス強度と影響度の2軸で構造化して無料公開します。';
 // OGP・canonical 用の絶対URL（astro.config.mjs の site + 現在パス）
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 
@@ -47,7 +47,7 @@ const nav = [
       href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
       rel="stylesheet"
     />
-    <!-- 本人／専門家トグルの初期状態（既定は本人向け）。ちらつき防止で head で適用。 -->
+    <!-- 表示切替（まず要点／くわしく）の初期状態（既定は parent=まず要点）。ちらつき防止で head で適用。 -->
     <script is:inline>
       try {
         var a = localStorage.getItem('audience') === 'expert' ? 'expert' : 'parent';

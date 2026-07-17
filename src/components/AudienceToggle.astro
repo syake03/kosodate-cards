@@ -1,13 +1,15 @@
 ---
-// SPEC.md §8 本人向け／専門家向けトグル。既定は「本人向け」。
+// SPEC.md §8 の表示切替（まず要点／くわしく）。既定は「まず要点」。
+// 読者の属性ではなく読む深さ・順番の切替なので、ラベルも深さで名乗る。
+// data-audience の値（parent/expert）は互換のため変えない。
 // 状態は <html data-audience> と localStorage で保持する。
 ---
 
 <div class="audience-toggle" role="group" aria-label="表示の切り替え">
   <span class="at-label">表示：</span>
   <div class="at-buttons">
-    <button type="button" data-audience-set="parent" class="at-btn">本人向け</button>
-    <button type="button" data-audience-set="expert" class="at-btn">専門家向け</button>
+    <button type="button" data-audience-set="parent" class="at-btn">まず要点</button>
+    <button type="button" data-audience-set="expert" class="at-btn">くわしく</button>
   </div>
   <p class="at-hint" data-audience-hint></p>
 </div>
@@ -18,8 +20,8 @@
     var btns = document.querySelectorAll('[data-audience-set]');
     var hintEl = document.querySelector('[data-audience-hint]');
     var HINTS = {
-      parent: '「どうする・よくある誤解」を前面に。まず読むならこちら。',
-      expert: '背景・エビデンスの限界・出典を全面展開します。',
+      parent: '「具体的にどうする」と「よくある誤解」を先頭に出します。',
+      expert: '「なぜ」から始め、エビデンスの限界・出典まで全面展開します。',
     };
     function apply(mode) {
       root.dataset.audience = mode;
