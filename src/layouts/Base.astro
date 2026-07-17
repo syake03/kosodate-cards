@@ -64,9 +64,20 @@ const nav = [
         <a class="brand" href={base}>
           <span class="brand-name">子育ての地図</span>
         </a>
-        <nav class="site-nav" aria-label="サイト内ナビゲーション">
+        {/* 広い画面用。狭い画面では display:none で a11y ツリーからも外れる。 */}
+        <nav class="site-nav site-nav-wide" aria-label="サイト内ナビゲーション">
           {nav.map((n) => <a href={n.href}>{n.label}</a>)}
         </nav>
+        {/* 狭い画面用。開閉して sticky ヘッダーの高さを1行に抑える。 */}
+        <details class="nav-disclosure">
+          <summary class="nav-toggle">
+            <span class="nav-toggle-bars" aria-hidden="true"></span>
+            メニュー
+          </summary>
+          <nav class="site-nav site-nav-menu" aria-label="サイト内ナビゲーション">
+            {nav.map((n) => <a href={n.href}>{n.label}</a>)}
+          </nav>
+        </details>
       </div>
     </header>
 
@@ -195,6 +206,88 @@ const nav = [
       .site-nav a:hover {
         background: var(--accent-weak);
         color: var(--accent);
+      }
+
+      /* 広い画面では常時表示のナビだけを出す。 */
+      .nav-disclosure {
+        display: none;
+      }
+
+      /* 狭い画面ではナビを開閉式に差し替え、sticky ヘッダーの高さを1行に抑える。 */
+      @media (max-width: 700px) {
+        .site-nav-wide {
+          display: none;
+        }
+        .nav-disclosure {
+          display: block;
+          position: static;
+        }
+        .nav-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          list-style: none;
+          cursor: pointer;
+          font-size: 0.9rem;
+          color: var(--ink-soft);
+          padding: 8px 12px;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          user-select: none;
+        }
+        .nav-toggle::-webkit-details-marker {
+          display: none;
+        }
+        .nav-toggle-bars,
+        .nav-toggle-bars::before,
+        .nav-toggle-bars::after {
+          display: block;
+          width: 16px;
+          height: 2px;
+          background: currentColor;
+          border-radius: 2px;
+        }
+        .nav-toggle-bars {
+          position: relative;
+        }
+        .nav-toggle-bars::before,
+        .nav-toggle-bars::after {
+          content: '';
+          position: absolute;
+          left: 0;
+        }
+        .nav-toggle-bars::before {
+          top: -5px;
+        }
+        .nav-toggle-bars::after {
+          top: 5px;
+        }
+        .nav-disclosure[open] .nav-toggle {
+          background: var(--accent-weak);
+          color: var(--accent);
+          border-color: var(--accent-weak);
+        }
+        /* 開いたメニューはヘッダー下にせり出す（本文を押し下げない）。 */
+        .nav-disclosure > .site-nav {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 100%;
+          flex-direction: column;
+          gap: 0;
+          background: var(--surface);
+          border-bottom: 1px solid var(--line);
+          box-shadow: var(--shadow);
+          padding: 6px 20px 12px;
+        }
+        .nav-disclosure > .site-nav a {
+          font-size: 1rem;
+          padding: 12px 8px;
+          border-radius: 8px;
+        }
+        .nav-disclosure > .site-nav a + a {
+          border-top: 1px solid var(--line);
+        }
       }
 
       main {
