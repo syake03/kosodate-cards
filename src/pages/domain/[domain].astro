@@ -1,8 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CardGrid from '../../components/CardGrid.astro';
+import AgeFilter from '../../components/AgeFilter.astro';
 import { getVisibleCards, sortByPriority } from '../../lib/cards';
-import { DOMAINS, type DomainId } from '../../lib/taxonomy';
+import { AGES, DOMAINS, type DomainId } from '../../lib/taxonomy';
 
 export async function getStaticPaths() {
   return DOMAINS.map((d) => ({ params: { domain: d.id }, props: { domain: d } }));
@@ -13,6 +14,14 @@ const base = import.meta.env.BASE_URL;
 const all = await getVisibleCards();
 const cards = sortByPriority(all.filter((c) => c.data.domain === (domain.id as DomainId)));
 const countByDomain = (id: string) => all.filter((c) => c.data.domain === id).length;
+
+// 年齢しぼりこみは、一覧を目で追うのがつらくなる枚数の領域にだけ出す。
+// （現状これに該当するのは安全・事故予防のみ。他領域もカードが増えれば自動的に出る）
+const AGE_FILTER_MIN_CARDS = 6;
+const ageCounts = Object.fromEntries(
+  AGES.map((a) => [a.id, cards.filter((c) => c.data.ages.includes(a.id)).length])
+);
+const showAgeFilter = cards.length >= AGE_FILTER_MIN_CARDS;
 ---
 
 <Base title={`${domain.label}のカード`} description={`${domain.label}：${domain.desc}`}>
@@ -48,7 +57,10 @@ const countByDomain = (id: string) => all.filter((c) => c.data.domain === id).le
         <h1 class="view-title">{domain.label}</h1>
         <p class="view-desc">{domain.desc}</p>
       </header>
-      <CardGrid cards={cards} empty={`${domain.label}のカードはまだありません。`} />
+      <div class="filterable">
+        {showAgeFilter && <AgeFilter counts={ageCounts} total={cards.length} />}
+        <CardGrid cards={cards} empty={`${domain.label}のカードはまだありません。`} />
+      </div>
     </div>
   </div>
 

@@ -10,6 +10,7 @@ interface CardData {
     domain: string;
     evidence: EvidenceId;
     impact: ImpactId;
+    ages?: string[];
   };
 }
 interface Props {
@@ -34,6 +35,7 @@ const { cards, featured = false, empty = 'このビューに該当するカー�
           evidence={c.data.evidence}
           impact={c.data.impact}
           featured={featured}
+          ages={c.data.ages}
         />
       ))}
     </div>
